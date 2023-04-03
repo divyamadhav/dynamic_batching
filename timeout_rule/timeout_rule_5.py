@@ -589,7 +589,7 @@ def static_rule(p, ver):
 # In[17]:
 
 
-for pr in project_list[40:]:
+for pr in project_list[42:]:
     for i in range(0,10):
         static_rule(pr, i)
 
