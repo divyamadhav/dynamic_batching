@@ -27,7 +27,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import sys
 sys.path.append("../")
-from projects import project_list
+from remaining import project_list
 
 
 # In[2]:
@@ -134,9 +134,13 @@ def sbs(path, ver):
     best_n_estimators = []
     best_max_depth = []
     
+    xsample = X_train.copy()
+    ysample = xsample['tr_status'].tolist()
+    xsample.drop('tr_status', inplace=True, axis=1)
+    xsample.drop('tr_build_id', inplace=True, axis=1) 
     best_f1 = 0
-    best_f1_sample = 0
-    best_f1_sample_result = 0
+    best_f1_sample = xsample
+    best_f1_sample_result = ysample
     best_f1_estimator = 0
     best_thresholds = []
     
@@ -589,13 +593,11 @@ def static_rule(p, ver):
 # In[17]:
 
 
-for pr in project_list[42:]:
+for pr in project_list:
     for i in range(0,10):
         static_rule(pr, i)
-
-
 # In[ ]:
 
 
 
-
+static_rule('apache-sling/apache-sling.csv', 9)
