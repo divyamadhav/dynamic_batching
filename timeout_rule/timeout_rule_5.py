@@ -26,8 +26,6 @@ import multiprocess
 import warnings
 warnings.filterwarnings("ignore")
 import sys
-sys.path.append("../")
-from remaining import project_list
 
 
 # In[2]:
@@ -37,7 +35,7 @@ batch_total = 0
 MAX_BATCH = [1, 2, 4, 8, 16]
 algorithm = ['BATCHBISECT', 'BATCH4', 'BATCHSTOP4']
 confidence = list(range(2,21,1))
-
+project_list = ['junit-team-junit5/junit-team-junit5.csv', 'ratpack-ratpack/ratpack-ratpack.csv', 'p6spy-p6spy/p6spy-p6spy.csv', 'apache-sling/apache-sling.csv']
 
 # In[3]:
 
