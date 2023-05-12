@@ -30,9 +30,9 @@ sys.path.append("../")
 from projects import project_list
 
 
-project_list = ['junit-team-junit5/junit-team-junit5.csv', 'ratpack-ratpack/ratpack-ratpack.csv', 'p6spy-p6spy/p6spy-p6spy.csv']
 # In[2]:
 
+project_list = ['apache-sling/apache-sling.csv']
 
 def get_first_failures(df):
     

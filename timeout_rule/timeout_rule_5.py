@@ -591,11 +591,11 @@ def static_rule(p, ver):
 # In[17]:
 
 
-for pr in project_list[:-1]:
-    for i in range(0,10):
-        static_rule(pr, i)
+#for pr in project_list[:-1]:
+#    for i in range(0,10):
+#        static_rule(pr, i)
 # In[ ]:
 
 
-
-static_rule('apache-sling/apache-sling.csv', 9)
+for i in range(0, 10):
+    static_rule('apache-sling/apache-sling.csv', 9-i)
