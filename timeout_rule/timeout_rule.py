@@ -27,18 +27,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-# In[2]:
-
-
-project_list = [
-    'graylog2-server.csv',
-    'android.csv',
-    'gradle.csv',
-    'okhttp.csv',
-    'cloudify.csv',
-]
-
-
 # In[18]:
 
 

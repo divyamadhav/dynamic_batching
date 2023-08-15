@@ -12,13 +12,12 @@ group_by(build_data, method) %>%
 
 static_batching <- build_data %>% filter(method == "baseline_static" | method == "new_dynamic")
 baseline_dynamic <- build_data %>% filter(method == "baseline_dynamic" | method == "new_dynamic")
-timeout_rule <- build_data %>% filter(method == "timeout_rule" | method == "new_dynamic")
 new_dynamic <- build_data %>% filter(method == "new_dynamic")
 
 kruskal.test(builds_saved ~ method, data = static_batching)
 kruskal.test(builds_saved ~ method, data = baseline_dynamic)
 
-N <- 94
+N <- length()
 res <- pairwise.wilcox.test(static_batching$builds_saved, static_batching$method,p.adjust.method = "BH")
 res
 Za = qnorm(res$p.value/2)
@@ -31,25 +30,3 @@ res
 Za = qnorm(res$p.value/2)
 ra = abs(Za)/sqrt(N)
 ra
-
-timeout_projects <- unique(build_data[build_data$method == "timeout_rule", "project"])
-timeout_new_dynamic <- filter(new_dynamic, project %in% timeout_projects)
-
-temp_projects <- unique(timeout_new_dynamic[, "project"])
-new_timeout_rule <- filter(timeout_rule, project %in% temp_projects)
-
-kruskal.test(builds_saved ~ method, data = new_timeout_rule)
-N <- 36
-res <- pairwise.wilcox.test(new_timeout_rule$builds_saved, new_timeout_rule$method,p.adjust.method = "BH")
-res
-Za = qnorm(res$p.value/2)
-ra = abs(Za)/sqrt(N)
-ra
-
-# baseline <- ssr_batch4 %>% filter(Group == "Batch4_Builds" )
-# hybrid <- ssr_batch4 %>% filter(Group == "SSR_Batch4_Builds" )
-# res <- wilcox.test(baseline$BuildsRequired, hybrid$BuildsRequired, p.adjust.method = "BH")
-# res
-# Za = qnorm(res$p.value/2)
-# ra = abs(Za)/sqrt(N)
-# ra

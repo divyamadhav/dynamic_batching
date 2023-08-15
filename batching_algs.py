@@ -5,8 +5,11 @@ def batchstop4(commits):
     
     if 0 in commits:
         
-        if len(commits) <= 4:
+        if len(commits) < 4:
             return len(commits)
+        
+        if len(commits) == 4:
+            return 1 + len(commits)
         
         return 1 + batchstop4(commits[:l]) + batchstop4(commits[l:])
     
@@ -35,8 +38,28 @@ def runbatch(batch):
 def batchdivide4(batch):
     test_number =0
     global testNumber
-
-    if (len(batch) == 12):
+    
+    if (len(batch) >=20):
+        sub_batch_len = len(batch)//4
+        sub_batch_1 = batch[:sub_batch_len]
+        sub_batch_2 = batch[sub_batch_len:2*sub_batch_len]
+        sub_batch_3 = batch[2*sub_batch_len:-sub_batch_len]
+        sub_batch_4 = batch[-sub_batch_len:]
+        
+        #print('hello {} {} {} {}'.format(len(sub_batch_1), len(sub_batch_2), len(sub_batch_3), len(sub_batch_4)))
+        
+        if (runbatch(sub_batch_1) == False):
+            test_number += batchstop4(sub_batch_1)
+        if (runbatch(sub_batch_2) == False):
+            test_number += batchstop4(sub_batch_2)
+        if (runbatch(sub_batch_3) == False):
+            test_number += batchstop4(sub_batch_3)
+        if (runbatch(sub_batch_4) == False):
+            test_number += batchstop4(sub_batch_4)
+        test_number += 4
+        
+    
+    elif (len(batch) == 12):
         sub_batch_1 = batch[0:3]
         sub_batch_2 = batch[3:6]
         sub_batch_3 = batch[6:9]
@@ -188,16 +211,7 @@ def batchdivide4(batch):
 
 
 
-    elif (len(batch) <= 5):
-        test_number = test_number + len(batch)
-    else:
-
-        sub_batch_right = batch[0:(int)(len(batch) / 2)]
-        sub_batch_left = batch[(int)(len(batch) / 2):len(batch)]
-        if (runbatch(sub_batch_right) == False):
-            test_number+=batchstop4(sub_batch_right)
-        if (runbatch(sub_batch_left) == False):
-            test_number+=batchstop4(sub_batch_left)
-        test_number+=2
+    elif (len(batch) <= 10):
+        test_number+=batchstop4(batch)
 
     return test_number

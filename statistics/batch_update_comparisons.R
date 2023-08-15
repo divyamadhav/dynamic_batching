@@ -1,7 +1,11 @@
-build_data <- read.csv('batch_update_methods.csv')
-baseline_data <- read.csv('baseline_dynamic_batching.csv')
-
 library(dplyr)
+library(effsize)
+build_data <- read.csv('/Users/divyakamath/Documents/icsme/dynamic batching/ci_skip_final_results.csv')
+
+new_dynamic <- build_data %>% filter(method == "new_dynamic")
+baseline_dynamic <- build_data %>% filter(method == "baseline_dynamic")
+baseline_static <- build_data %>% filter(method == "baseline_static")
+
 group_by(build_data, update_method) %>%
   summarise(
     count = n(),
@@ -11,66 +15,49 @@ group_by(build_data, update_method) %>%
     IQR = IQR(builds_saved, na.rm = TRUE)
   )
 
+new_dynamic['final_methods'] <- paste(new_dynamic$update_method, new_dynamic$factor)
+
 algorithms <- list("BATCHBISECT", "BATCHSTOP4", "BATCHDIVIDE4")
+methods <- unique(new_dynamic$final_methods)
 
-methods <- list(build_data$update_method)
-factors <- list(build_data$factor)
-final_methods <- c(methods, factors)
-
-build_data['final_methods'] <- final_methods
-
-kruskal.test(builds_saved ~ final_methods, data = build_data)
-pairwise.wilcox.test(build_data$builds_saved, build_data$final_methods,p.adjust.method = "BH")
+new_dynamic <- subset(new_dynamic, update_method != 'half_exp')
 
 for (alg in algorithms) {
   
+  alg_data <- new_dynamic %>% filter(algorithm == alg)
+  
   print(alg)
-  print("--------")
-  
-  alg_data <- build_data %>% filter(algorithm == alg)
-  baseline_alg <- baseline_data %>% filter(algorithm == alg)
-  
   res <- kruskal.test(builds_saved ~ final_methods, data = alg_data)
   print(res)
+  
   res <- pairwise.wilcox.test(alg_data$builds_saved, alg_data$final_methods,p.adjust.method = "BH")
   print(res)
+  N <- length(alg_data$builds_saved)
+  Za = qnorm(res$p.value/2)
+  ra = abs(Za)/sqrt(N)
+  print(ra)
   
-  
-  linear_2 <- alg_data %>% filter(update_method == "linear" & factor == "2")
-  linear_3 <- alg_data %>% filter(update_method == "linear" & factor == "3")
-  linear_4 <- alg_data %>% filter(update_method == "linear" & factor == "4")
-  exponential_2 <- alg_data %>% filter(update_method == "exponential" & factor == "2") 
-  exponential_3 <- alg_data %>% filter(update_method == "exponential" & factor == "3") 
-  random_linear <- alg_data %>% filter(update_method == "random_linear" & factor == "-1") 
-  random_exp <- alg_data %>% filter(update_method == "random_exponential" & factor == "-1") 
-  stagger_2 <- alg_data %>% filter(update_method == "stagger" & factor == "2") 
-  stagger_3 <- alg_data %>% filter(update_method == "stagger" & factor == "3") 
-  
-  res <- wilcox.test(linear_2$builds_saved, baseline_alg$builds_saved, paired=TRUE)
+  res <- cliff.delta(builds_saved ~ final_methods, data = alg_data, return.dm=TRUE)
   print(res)
   
-  res <- wilcox.test(linear_3$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(linear_4$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(exponential_2$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(exponential_3$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(random_linear$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(random_exp$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(stagger_2$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
-  res <- wilcox.test(stagger_3$builds_saved, baseline_alg$builds_saved, paired=TRUE)
-  print(res)
-  
+  # for (m in methods) {
+  #   
+  #   print(alg)
+  #   print(m)
+  #   
+  #   m_data <- alg_data %>% filter(final_methods == m)
+  #   w_skip = m_data %>% filter(ci_skip == 1)
+  #   wo_skip = m_data %>% filter(ci_skip == 0)
+  #   
+  #   res <- wilcox.test(w_skip$builds_saved, wo_skip$builds_saved, paired=TRUE)
+  #   print(res)
+  #   # N <- length(w_skip$project) + length(wo_skip$project)
+  #   # Za = qnorm(res$p.value/2)
+  #   # ra = abs(Za)/sqrt(N)
+  #   # print(ra)
+  #   res <- cliff.delta(w_skip$builds_saved, wo_skip$builds_saved,return.dm=TRUE)
+  #   print(res)
+  #   
+  # }
 }
+
